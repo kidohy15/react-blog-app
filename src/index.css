@@ -11,3 +11,46 @@ code {
   font-family: source-code-pro, Menlo, Monaco, Consolas, 'Courier New',
     monospace;
 }
+
+/* HEADER 영역 */
+
+header {
+  display: flex;
+  justify-content: space-between;
+  flex-direction: row-reverse; /* flex 로 요소 쌓이는게 오른쪽에서 시작하게 됨 */
+  border-bottom: 1px solid #f2f2f2;
+  padding: 10px 40px;
+  min-height: 40px;
+  align-items: center;
+}
+
+header a {
+  margin: 0px 10px;
+  text-decoration: none;  /* a태그가 가지고 있는 기본적인 스타일을 제거한다 ex) 밑줄 같은 것*/
+  color: gray;
+}
+
+header a:focus,
+header a:hover {
+  color: black;
+}
+
+/* FOOTER 영역 */
+footer {
+  background-color: #f2f2f2;
+  min-height: 40px;
+  padding: 20px 40px;
+  font-size: 14px;
+  text-align: center;
+  display: flex; /* 기본 방량이 수평 정렬 */
+  align-items: center; /* 수직 가운데로 정렬 */
+  justify-content: center; /* 수평 가운데 정렬 */
+  gap: 20px;
+}
+
+/* post list */
+.post-list {
+  min-height: 90vh; /* vh = 뷰포트 기준 90% 높이 */
+  padding: 20px 40px;
+  text-align: center;
+}
