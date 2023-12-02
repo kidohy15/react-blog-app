@@ -7,7 +7,6 @@ import PostEdit from "pages/posts/edit";
 import ProfilePage from "pages/profile";
 import LoginePage from "pages/login";
 import SignupPage from "pages/signup";
-import { useState } from "react";
 
 interface RouteProps {
   isAuthenticated: boolean;
@@ -17,6 +16,7 @@ export default function Router({ isAuthenticated }: RouteProps) {
 
   return (
     <>
+      {/* 사용자 인증 유무에 따라 분기 처리 */}
       <Routes>
         {isAuthenticated ? (
           <>
@@ -26,8 +26,8 @@ export default function Router({ isAuthenticated }: RouteProps) {
             <Route path='/posts/new' element={<PostNew/>} />
             <Route path='/posts/edit/:id' element={<PostEdit/>} />
             <Route path='/profile' element={<ProfilePage/>} />
-            <Route path='/login' element={<LoginePage/>} />
-            <Route path='/signup' element={<SignupPage/>} />
+            {/* <Route path='/login' element={<LoginePage/>} /> */}
+            {/* <Route path='/signup' element={<SignupPage/>} /> */}
             <Route path='*' element={<Navigate replace to="/"/>} />
           </>
           ) : (
