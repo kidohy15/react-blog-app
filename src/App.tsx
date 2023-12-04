@@ -9,7 +9,7 @@ import Loader from "components/Loader";
 function App() {
   const auth = getAuth(app);
   // console.log(auth);
-  console.log(db);
+  // console.log(db);
   
   // auth를 체크하기 전에 (initialize 전)에는 loader를 듸워주는 용도
   const [init, setInit] = useState<boolean>(false);
