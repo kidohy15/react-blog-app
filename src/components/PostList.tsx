@@ -10,8 +10,8 @@ interface PostListProps {
 
 type TabType = "all" | "my";
 
-interface PostProps {
-  id: string;
+export interface PostProps {
+  id?: string;
   title: string;
   email: string;
   summary: string;
@@ -24,13 +24,13 @@ export default function PostList({ hasNavigation = true }: PostListProps) {
   const [posts, setPosts] = useState<PostProps[]>([]);
   const { user } = useContext(AuthContext);
 
+  // firestore에서 리스트 값 가져오기
   const getPosts = async () => {
     const datas = await getDocs(collection(db, "posts"));
-
     // console.log("datas", datas);
 
     datas?.forEach((doc) => {
-      console.log(doc.data(), doc.id);
+      // console.log(doc.data(), doc.id);
       const dataObj = { ...doc.data(), id: doc.id };
       setPosts((prev) => [...prev, dataObj as PostProps]);
     });
@@ -70,7 +70,7 @@ export default function PostList({ hasNavigation = true }: PostListProps) {
                 <div className="post__date">{post?.createdAt}</div>
               </div>
               <div className="post__title">{post?.title}</div>
-              <div className="post__text">{post?.content}</div>
+              <div className="post__text">{post?.summary}</div>
             </Link>
             
               {post?.email === user?.email && (
