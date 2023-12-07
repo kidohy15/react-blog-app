@@ -1,13 +1,15 @@
 import { useEffect, useState } from "react";
-import { Link, useParams } from "react-router-dom";
+import { Link, Navigate, useNavigate, useParams } from "react-router-dom";
 import { PostProps } from "./PostList";
-import { doc, getDoc } from "firebase/firestore";
+import { deleteDoc, doc, getDoc } from "firebase/firestore";
 import { db } from "firebaseApp";
 import Loader from "./Loader";
+import { toast } from "react-toastify";
 
 export default function PostDetail() {
   const params = useParams();
   const [post, setPost] = useState<PostProps | null>(null);
+  const navigate = useNavigate();
   // console.log("params", params);
 
   // firestore에서 단일 문서(doc) 가져오기
@@ -22,8 +24,14 @@ export default function PostDetail() {
   };
   // console.log(post);
 
-  const handleDelete = () => {
-    console.log("delete");
+  const handleDelete = async () => {
+    // console.log("delete");
+    const confirm = window.confirm("해당 게시글을 삭제하시겠습니까?");
+    if (confirm && post && post.id) {
+      await deleteDoc(doc(db, "posts", post.id));
+      toast.success("게시글을 삭제했습니다.");
+      navigate("/");
+    }
   }
 
   useEffect(() => {

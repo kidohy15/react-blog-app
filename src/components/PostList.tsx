@@ -1,8 +1,9 @@
 import AuthContext from "context/AuthContext";
-import { collection, getDocs } from "firebase/firestore";
+import { collection, deleteDoc, doc, getDocs } from "firebase/firestore";
 import { db } from "firebaseApp";
 import { useEffect, useState, useContext } from "react";
 import { Link } from "react-router-dom";
+import { toast } from "react-toastify";
 
 interface PostListProps {
   hasNavigation?: boolean;
@@ -30,7 +31,7 @@ export default function PostList({ hasNavigation = true }: PostListProps) {
   const getPosts = async () => {
     const datas = await getDocs(collection(db, "posts"));
     // console.log("datas", datas);
-
+    setPosts([]); // 동일 리스트가 쌓이지 않도록 호출 시 처음에 초기화
     datas?.forEach((doc) => {
       // console.log(doc.data(), doc.id);
       const dataObj = { ...doc.data(), id: doc.id };
@@ -38,7 +39,17 @@ export default function PostList({ hasNavigation = true }: PostListProps) {
     });
   };
 
-  console.log("posts", posts);
+  // console.log("posts", posts);
+
+  // 삭제 버튼
+  const handleDelete = async (id: string) => {
+    const confirm = window.confirm("해당 게시글을 삭제하시겠습니까?");
+    if (confirm && id) {
+      await deleteDoc(doc(db, "posts", id));
+      toast.success("게시글을 삭제했습니다.");
+      getPosts(); // 삭제 후 변경된 posts 리스트를 가져오도록 한다
+    }
+  };
 
   useEffect(() => {
     getPosts();
@@ -77,7 +88,13 @@ export default function PostList({ hasNavigation = true }: PostListProps) {
             
               {post?.email === user?.email && (
                 <div className="post__utils-box">
-                  <div className="post__delete">삭제</div>
+                <div
+                  className="post__delete"
+                  role="presentation"
+                  onClick={() => handleDelete(post.id as string)}
+                >
+                  삭제
+                </div>
                   <div className="post__edit">
                   <Link to={`/posts/edit/${post?.id}`}>
                     수정
