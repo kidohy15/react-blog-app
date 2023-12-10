@@ -4,7 +4,7 @@ import { app, db } from "firebaseApp";
 import AuthContext from "context/AuthContext";
 import { useNavigate, useParams } from "react-router-dom";
 import { toast } from "react-toastify";
-import { PostProps } from "./PostList";
+import { CATEGORIESD, CategoryType, PostProps } from "./PostList";
 
 export default function PostForm() {
   const params = useParams();
@@ -12,6 +12,7 @@ export default function PostForm() {
   const [title, setTitle] = useState("");
   const [summary, setSummary] = useState("");
   const [content, setContent] = useState("");
+  const [category, setCategory] = useState<CategoryType>("Frontend");
   const { user } = useContext(AuthContext);
   const navigate = useNavigate();
 
@@ -35,11 +36,12 @@ export default function PostForm() {
             minute: "2-digit",
             second: "2-digit",
           }),
+          category: category,
         });
-
+        
         toast?.success("게시글을 수정했습니다.");
         navigate(`/posts/${post.id}`);
-
+        
       } else {
         // firestore로 데이터 생성
         await addDoc(collection(db, "posts"), {
@@ -53,8 +55,9 @@ export default function PostForm() {
           }),
           email: user?.email,
           uid: user?.uid,
+          category: category,
         });
-
+        
         toast?.success("게시글을 생성했습니다.");
         navigate("/");
       }
@@ -66,7 +69,9 @@ export default function PostForm() {
   };
 
   const onChange = (
-    e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>
+    e: React.ChangeEvent<
+      HTMLInputElement | HTMLTextAreaElement | HTMLSelectElement
+    >
   ) => {
     const {
       target: { name, value },
@@ -80,6 +85,9 @@ export default function PostForm() {
     }
     if (name === "content") {
       setContent(value);
+    }
+    if (name === "category") {
+      setCategory(value as CategoryType);
     }
   }
 
@@ -102,6 +110,7 @@ export default function PostForm() {
       setTitle(post?.title);
       setSummary(post?.summary);
       setContent(post?.content);
+      setCategory(post?.category as CategoryType);
     }
   }, [post]);
 
@@ -117,6 +126,23 @@ export default function PostForm() {
           onChange={onChange}
           value={title}
         />
+      </div>
+      <div className="form__block">
+        <label htmlFor="catogory">카테고리</label>
+        <select
+          name="category"
+          id="category"
+          onChange={onChange}
+          // defaultValue={category}
+        >
+          <option value="">카테고리를 선택해주세요</option>
+          {CATEGORIESD?.map((category) => (
+            <option value={category} key={category}>
+              {category}
+            </option>
+          ))}
+        </select>
+
       </div>
       <div className="form__block">
         <label htmlFor="summary">요약</label>

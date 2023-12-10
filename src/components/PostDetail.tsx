@@ -49,7 +49,10 @@ export default function PostDetail() {
             <div className="post__author-name">{post?.email}</div>
             <div className="post__date">{post?.createdAt}</div>
           </div>
-          <div className="post__utils-box">
+            <div className="post__utils-box">
+              {post?.category && (
+                <div className="post__category">{post?.category}</div>
+              )}
             <div
               className="post__delete"
               role="presentation"
