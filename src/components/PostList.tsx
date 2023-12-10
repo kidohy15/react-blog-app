@@ -1,5 +1,5 @@
 import AuthContext from "context/AuthContext";
-import { collection, deleteDoc, doc, getDocs } from "firebase/firestore";
+import { collection, deleteDoc, doc, getDocs, orderBy, query, where } from "firebase/firestore";
 import { db } from "firebaseApp";
 import { useEffect, useState, useContext } from "react";
 import { Link } from "react-router-dom";
@@ -7,6 +7,7 @@ import { toast } from "react-toastify";
 
 interface PostListProps {
   hasNavigation?: boolean;
+  defaultTab?: TabType;
 }
 
 type TabType = "all" | "my";
@@ -22,16 +23,36 @@ export interface PostProps {
   uid: string;
 }
 
-export default function PostList({ hasNavigation = true }: PostListProps) {
-  const [activeTab, setActiveTab] = useState<TabType>("all");
+export default function PostList({
+  hasNavigation = true,
+  defaultTab = "all"
+}: PostListProps) {
+  const [activeTab, setActiveTab] = useState<TabType>(defaultTab);
   const [posts, setPosts] = useState<PostProps[]>([]);
   const { user } = useContext(AuthContext);
 
   // firestore에서 리스트 값 가져오기
   const getPosts = async () => {
-    const datas = await getDocs(collection(db, "posts"));
-    // console.log("datas", datas);
+    // const datas = await getDocs(collection(db, "posts"));
     setPosts([]); // 동일 리스트가 쌓이지 않도록 호출 시 처음에 초기화
+
+    let postsRef = collection(db, "posts");
+    let postsQuery;
+    
+    if (activeTab == 'my' && user) {
+      // 나의 글만 필터링
+      postsQuery = query(
+        postsRef,
+        where('uid', '==', user.uid), // uid == user.uid 
+        orderBy("createdAt", "asc")
+      ); 
+    } else {
+      // 모든 글 보여주기
+      postsQuery = query(postsRef, orderBy("createdAt", "asc")); // 생성 날짜 최신순으로 리스트 가져올 수 있도록
+    }
+    
+    const datas = await getDocs(postsQuery);
+    
     datas?.forEach((doc) => {
       // console.log(doc.data(), doc.id);
       const dataObj = { ...doc.data(), id: doc.id };
@@ -53,7 +74,7 @@ export default function PostList({ hasNavigation = true }: PostListProps) {
 
   useEffect(() => {
     getPosts();
-  }, []);
+  }, [activeTab]);
 
   return (
     <>
