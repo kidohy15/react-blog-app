@@ -6,26 +6,27 @@ import { toast } from "react-toastify";
 import { db } from "firebaseApp";
 
 // 댓글 더미 데이터
-const COMMENTS = [
-  {
-    id: 1,
-    email: "test@test.copm",
-    content: "댓글입니다.",
-    createdAt: "2023-06-13",
-  },
-  {
-    id: 2,
-    email: "test@test.copm",
-    content: "댓글입니다.",
-    createdAt: "2023-06-13",
-  },
-]
+// const COMMENTS = [
+//   {
+//     id: 1,
+//     email: "test@test.copm",
+//     content: "댓글입니다.",
+//     createdAt: "2023-06-13",
+//   },
+//   {
+//     id: 2,
+//     email: "test@test.copm",
+//     content: "댓글입니다.",
+//     createdAt: "2023-06-13",
+//   },
+// ]
 
 interface CommentProps {
   post: PostProps;
+  getPost: (id: string) => Promise<void>;
 }
 
-export default function Comments({ post }: CommentProps) {
+export default function Comments({ post, getPost }: CommentProps) {
   console.log("post",post)  
   const [comment, setComment] = useState("");
   const { user } = useContext(AuthContext);
@@ -66,6 +67,9 @@ export default function Comments({ post }: CommentProps) {
               second: "2-digit",
             }),
           });
+          
+          // 문서 업데이트
+          await getPost(post.id); // 댓글 실시간 반영
         };
       }
       toast.success("댓글을 생성했습니다.");
@@ -93,8 +97,12 @@ export default function Comments({ post }: CommentProps) {
         </div>
       </form>
       <div className="comments__list">
-        {COMMENTS?.map((comment) => (
-          <div key={comment.id} className="comment__box">
+        {/* {COMMENTS?.map((comment) => ( 더미 데이터 사용했던 부분 */}
+        {post.comments
+          ?.slice(0)
+          ?.reverse()
+          .map((comment) => (
+          <div key={comment.createdAt} className="comment__box">
             <div className="comment__profile-box">
               <div className="comment__email">{comment?.email}</div>
               <div className="comment__date">{comment?.createdAt}</div>
