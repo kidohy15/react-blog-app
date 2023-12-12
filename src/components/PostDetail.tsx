@@ -70,7 +70,7 @@ export default function PostDetail() {
                 {post?.content}
               </div>
             </div>
-            <Comments />
+            <Comments post={post}/>
           </>
         ) : (
           <Loader />    
