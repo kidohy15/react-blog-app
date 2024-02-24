@@ -1,5 +1,13 @@
 import AuthContext from "context/AuthContext";
-import { collection, deleteDoc, doc, getDocs, orderBy, query, where } from "firebase/firestore";
+import {
+  collection,
+  deleteDoc,
+  doc,
+  getDocs,
+  orderBy,
+  query,
+  where,
+} from "firebase/firestore";
 import { db } from "firebaseApp";
 import { useEffect, useState, useContext } from "react";
 import { Link } from "react-router-dom";
@@ -38,14 +46,16 @@ export const CATEGORIESD: CategoryType[] = [
   "Frontend",
   "Backend",
   "Web",
-  "Native"
+  "Native",
 ];
 
 export default function PostList({
   hasNavigation = true,
-  defaultTab = "all"
+  defaultTab = "all",
 }: PostListProps) {
-  const [activeTab, setActiveTab] = useState<TabType | CategoryType>(defaultTab);
+  const [activeTab, setActiveTab] = useState<TabType | CategoryType>(
+    defaultTab
+  );
   const [posts, setPosts] = useState<PostProps[]>([]);
   const { user } = useContext(AuthContext);
 
@@ -56,28 +66,28 @@ export default function PostList({
 
     let postsRef = collection(db, "posts");
     let postsQuery;
-    
-    if (activeTab == 'my' && user) {
+
+    if (activeTab === "my" && user) {
       // 나의 글만 필터링
       postsQuery = query(
         postsRef,
-        where('uid', '==', user.uid), // uid == user.uid 
+        where("uid", "==", user.uid), // uid == user.uid
         orderBy("createdAt", "asc")
-        ); 
-      } else if(activeTab === "all"){
-        // 모든 글 보여주기
-        postsQuery = query(postsRef, orderBy("createdAt", "asc")); // 생성 날짜 최신순으로 리스트 가져올 수 있도록
-      } else {
-        // 카테고리를 보여주기
-        postsQuery = query(
-          postsRef,
-          where('category', '==', activeTab),  
-          orderBy("createdAt", "asc")
-        ); // 생성 날짜 최신순으로 리스트 가져올 수 있도록
+      );
+    } else if (activeTab === "all") {
+      // 모든 글 보여주기
+      postsQuery = query(postsRef, orderBy("createdAt", "asc")); // 생성 날짜 최신순으로 리스트 가져올 수 있도록
+    } else {
+      // 카테고리를 보여주기
+      postsQuery = query(
+        postsRef,
+        where("category", "==", activeTab),
+        orderBy("createdAt", "asc")
+      ); // 생성 날짜 최신순으로 리스트 가져올 수 있도록
     }
-    
+
     const datas = await getDocs(postsQuery);
-    
+
     datas?.forEach((doc) => {
       // console.log(doc.data(), doc.id);
       const dataObj = { ...doc.data(), id: doc.id };
@@ -99,11 +109,13 @@ export default function PostList({
 
   useEffect(() => {
     getPosts();
+
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [activeTab]);
 
   return (
     <>
-      { hasNavigation && (
+      {hasNavigation && (
         <div className="post__navigation">
           <div
             role="presentation"
@@ -124,7 +136,9 @@ export default function PostList({
               key={category}
               role="presentation"
               onClick={() => setActiveTab(category)}
-              className={activeTab === category ? "post__navigation--active" : ""}
+              className={
+                activeTab === category ? "post__navigation--active" : ""
+              }
             >
               {category}
             </div>
@@ -132,38 +146,37 @@ export default function PostList({
         </div>
       )}
       <div className="post__list">
-        {posts?.length > 0 ? posts.map((post, index) => (
-          <div key={post?.id} className="post__box">
-            <Link to={`/posts/${post?.id}`}>
-              <div className="post__profile-box">
-                <div className="post__profile"></div>
-                <div className="post__author-name">{post?.email}</div>
-                <div className="post__date">{post?.createdAt}</div>
-              </div>
-              <div className="post__title">{post?.title}</div>
-              <div className="post__text">{post?.summary}</div>
-            </Link>
-            
+        {posts?.length > 0 ? (
+          posts.map((post, index) => (
+            <div key={post?.id} className="post__box">
+              <Link to={`/posts/${post?.id}`}>
+                <div className="post__profile-box">
+                  <div className="post__profile"></div>
+                  <div className="post__author-name">{post?.email}</div>
+                  <div className="post__date">{post?.createdAt}</div>
+                </div>
+                <div className="post__title">{post?.title}</div>
+                <div className="post__text">{post?.summary}</div>
+              </Link>
+
               {post?.email === user?.email && (
                 <div className="post__utils-box">
-                <div
-                  className="post__delete"
-                  role="presentation"
-                  onClick={() => handleDelete(post.id as string)}
-                >
-                  삭제
-                </div>
+                  <div
+                    className="post__delete"
+                    role="presentation"
+                    onClick={() => handleDelete(post.id as string)}
+                  >
+                    삭제
+                  </div>
                   <div className="post__edit">
-                  <Link to={`/posts/edit/${post?.id}`}>
-                    수정
-                  </Link>
+                    <Link to={`/posts/edit/${post?.id}`}>수정</Link>
                   </div>
                 </div>
               )}
-            
-          </div>
-        )) : (
-          <div className="post__no-post">게시글이 업습니다.</div>
+            </div>
+          ))
+        ) : (
+          <div className="post__no-post">게시글이 없습니다.</div>
         )}
       </div>
     </>
